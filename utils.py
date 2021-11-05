@@ -13,7 +13,7 @@ def youtube_authenticate():
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
     api_service_name = "youtube"
     api_version = "v3"
-    client_secrets_file = "credentials.json"
+    client_secrets_file = "credentials1.json"
     creds = None
     # the file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first time
@@ -67,10 +67,16 @@ def print_video_infos(video_response):
     description   = snippet["description"]
     publish_time  = snippet["publishedAt"]
     # get stats infos
-    comment_count = statistics["commentCount"]
-    like_count    = statistics["likeCount"]
-    dislike_count = statistics["dislikeCount"]
-    view_count    = statistics["viewCount"]
+    keyError = 0
+    try:
+        comment_count = statistics["commentCount"]
+        like_count    = statistics["likeCount"]
+        dislike_count = statistics["dislikeCount"]
+        view_count    = statistics["viewCount"]
+    except KeyError:
+        print("Video hides comments and likes")
+        keyError = 1
+
     # get duration from content details
     duration = content_details["duration"]
     # duration in the form of something like 'PT5H50M15S'
@@ -81,18 +87,20 @@ def print_video_infos(video_response):
         if d:
             duration_str += f"{d[:-1]}:"
     duration_str = duration_str.strip(":")
-    print(f"""
-    Title: {title}
-    Description: {description}
-    Channel Title: {channel_title}
-    Publish time: {publish_time}
-    Duration: {duration_str}
-    Number of comments: {comment_count}
-    Number of likes: {like_count}
-    Number of dislikes: {dislike_count}
-    Number of views: {view_count}
-    """)
-
+    if(keyError==0):
+        print(f"""
+        Title: {title}
+        Description: {description}
+        Channel Title: {channel_title}
+        Publish time: {publish_time}
+        Duration: {duration_str}
+        Number of comments: {comment_count}
+        Number of likes: {like_count}
+        Number of dislikes: {dislike_count}
+        Number of views: {view_count}
+        """)
+    else:
+        print("Video hides comments and likes")
 
 def parse_channel_url(url):
     """
