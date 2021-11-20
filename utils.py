@@ -13,7 +13,7 @@ def youtube_authenticate():
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
     api_service_name = "youtube"
     api_version = "v3"
-    client_secrets_file = "credentials1.json"
+    client_secrets_file = "credentials.json"
     creds = None
     # the file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first time
@@ -21,6 +21,9 @@ def youtube_authenticate():
         with open("token.pickle", "rb") as token:
             creds = pickle.load(token)
     # if there are no (valid) credentials availablle, let the user log in.
+
+
+
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -43,7 +46,7 @@ def get_channel_details(youtube, **kwargs):
 
 def search(youtube, **kwargs):
     return youtube.search().list(
-        part="snippet",
+        part="snippet",type='video',
         **kwargs
     ).execute()
 
@@ -54,6 +57,15 @@ def get_video_details(youtube, **kwargs):
         **kwargs
     ).execute()
 
+def get_video_likes(video_response):
+    items = video_response.get("items")[0]
+    return int(items["statistics"]["likeCount"])
+
+def get_video_dislikes(video_response):
+    items = video_response.get("items")[0]
+    return int(items["statistics"]["dislikeCount"])
+
+    #dislikes += int(dislike_counts)
 
 def print_video_infos(video_response):
     items = video_response.get("items")[0]
@@ -70,7 +82,7 @@ def print_video_infos(video_response):
     keyError = 0
     try:
         comment_count = statistics["commentCount"]
-        like_count    = statistics["likeCount"]
+        like_count   = statistics["likeCount"]
         dislike_count = statistics["dislikeCount"]
         view_count    = statistics["viewCount"]
     except KeyError:
