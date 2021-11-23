@@ -1,8 +1,10 @@
 import pickle
 import pandas as pd
+from pandas._libs.tslibs import timestamps
 import tweepy
 from tweepy import OAuthHandler
 from textblob import TextBlob
+from datetime import datetime
 import plotly.graph_objects as go
   
 class TwitterClient(object):
@@ -33,14 +35,16 @@ class TwitterClient(object):
             return 'positive'
         elif analysis.sentiment.polarity < 0:
             return 'negative'
+        else: 
+            return 'neutral'
   
-    def get_tweets(self, query, count = 10):
+    def get_tweets(self, query, count, u):
         # empty list to store parsed tweets
         tweets = []
   
         try:
             # call twitter api to fetch tweets
-            fetched_tweets = self.api.search_tweets(q = query, count = count)
+            fetched_tweets = self.api.search_tweets(q = query, count = count, until = u)
   
             # parsing tweets one by one
             for tweet in fetched_tweets:
@@ -51,6 +55,15 @@ class TwitterClient(object):
                 parsed_tweet['text'] = tweet.text
                 # saving sentiment of tweet
                 parsed_tweet['sentiment'] = self.getSentiment(tweet.text)
+                
+                s = str(tweet.created_at)
+
+                x= s.split('-')
+                y = x[2].split(' ')
+                h = y[1].split(':')
+                hour = h[0]
+
+                parsed_tweet['hour'] = hour
   
                 # appending parsed tweet to tweets list
                 if tweet.retweet_count > 0:
@@ -70,19 +83,25 @@ def main():
     # create TwitterClient object 
     api = TwitterClient()
     # calling function to get tweets
-    tweets = api.get_tweets(query = 'South China Sea', count = 200)
+    tweets = api.get_tweets(query = 'South China Sea', count = 1000, u='2021-11-16')
   
     # put positive tweets and negative tweets in lists
     ptweets = [tweet for tweet in tweets if tweet['sentiment'] == 'positive']
     ntweets = [tweet for tweet in tweets if tweet['sentiment'] == 'negative']
+    neutweets = [tweet for tweet in tweets if tweet['sentiment'] == 'neutral']
 
     #dislaying them on a plotly pie chart
-    fig = go.Figure(data=[go.Pie(labels=['Positive Tweets','Negative Tweets'], values=[len(ptweets), len(ntweets)])])
+    fig = go.Figure(data=[go.Pie(labels=['Positive Tweets', 'Negative Tweets', 'Neutral Tweets'], values=[len(ptweets), len(ntweets), len(neutweets)])])
     fig.update_layout(title_text="Proportion of Positive and Negative Tweets on the South China Sea")
     fig.show()
-    df = pd.DataFrame(tweets)
-    df.to_csv('new_file.csv')
-    print(df.shape)
-    print(df)
+
+    df = pd.DataFrame(ptweets)
+    df.to_csv('posTweets.csv')
+    df = pd.DataFrame(ntweets)
+    df.to_csv('negTweets.csv')
+    df = pd.DataFrame(neutweets)
+    df.to_csv('neuTweets.csv')
+
+
 
 if __name__ == "__main__": main()
