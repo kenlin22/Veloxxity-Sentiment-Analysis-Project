@@ -113,13 +113,16 @@ if __name__ == "__main__":
                                     else:
                                         polarity = "Neutral"
                                         pnn[2] += 1
-
+                                fields = ['positive','negative','neutral']
+                                rows = [pnn[0], pnn[1], pnn[2]]
+                                with open(youtube.csv,'w') as csvfile:
+                                    csvwriter.writerow(rows)
                                 if "nextPageToken" in response:
                                 # if there is a next page
                                 # add next page token to the params we pass to the function
                                     params["pageToken"] =  response["nextPageToken"]
                                 else:
-                                # must be end of comments!!!!
+                                # end of comments
                                     break
                         except:
                             print("Error403")
@@ -134,7 +137,9 @@ if __name__ == "__main__":
     neg = pnn[1]
     pos = pnn[0]
     neu = pnn[2]
-
+    
+    
+    ## graph
     fig1 = go.Figure(data=[go.Pie(labels=['Likes','Dislikes'], values=[likes,dislikes])])
     fig1.update_layout(title_text="Pie chart of "+input)
     fig1.show()
