@@ -7,3 +7,9 @@ sentiment analysis that collects viral posts with regards to the international c
 China Sea. The application will be deployed as a Representational state transfer (REST) API with
 the objective of providing a solution to the distribution of misinformation on online social media
 platforms.
+
+Running ytapiv2.py
+  First we need credentials from google API.
+  In order to get credentials, visit https://developers.google.com/youtube/v3/getting-started and download the AUTHpath in JSON format and rename the file as "credentials.json"     and save it to the same directory as ytapivs.py.
+  We need util.py in the same directory as well.
+  
