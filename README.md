@@ -9,7 +9,11 @@ the objective of providing a solution to the distribution of misinformation on o
 platforms.
 
 Running ytapiv2.py
+
+
   First we need credentials from google API.
   In order to get credentials, visit https://developers.google.com/youtube/v3/getting-started and download the AUTHpath in JSON format and rename the file as "credentials.json"     and save it to the same directory as ytapivs.py.
   We need util.py in the same directory as well.
+  Everytime the token expired, revisit the google website to get refreshed token and update the credentials file.
+  Once you get the new credentials, comment out line20-22 in util.py and authenticate yourself through google to run ytapiv2.py. After that you can uncomment the same lines until the token expired.
   
