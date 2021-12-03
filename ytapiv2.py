@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # videocount = input("How many videos to analyse")
     youtube = youtube_authenticate()
     # search for the query 'python' and retrieve 2 items only
-    response = search(youtube, q=input, maxResults=15)
+    response = search(youtube, q=input, maxResults=4)
     items = response.get("items")
     pnn = [0,0,0]
     positivewords = []
@@ -62,7 +62,9 @@ if __name__ == "__main__":
 
                             views = get_video_views(video_response)
                             titles = get_video_title(video_response)
-                            video_rows = [titles, views]
+                            dislikecounts = get_video_dislikes(video_response)
+                            likecounts = get_video_likes(video_response)
+                            video_rows = [titles, views, dislikecounts, likecounts, dislikecounts/likecounts]
                             writerv = csv.writer(vfile)
                             writerv.writerow(video_rows)
                             print_video_infos(video_response)
@@ -132,13 +134,28 @@ if __name__ == "__main__":
     neu = pnn[2]
     
     ## most viewed video details
-    col_name = ['title','views']
+    col_name = ['title','views','dislikes','likes','rate']
     df = pd.read_csv('video.csv', names=col_name, encoding= 'unicode_escape')
     max = df.sort_values(by=['views']).max()
+    dismax = df.sort_values(by=['dislikes']).max()
+    print("Most viewed video: ")
     print(max)
+    print("\n\n")
+    print("Most disliked video by numbers: ")
+    print(dismax)
+    print("\n\n")
+    rate = df.sort_values(by=['rate']).max()
+    print("Most disliked video by like counts: ")
+    print(rate)
+    print("\n\n")
+    maxlike = df.sort_values(by=['likes']).max()
+    print("Most liked video by like counts: ")
+    print(maxlike)
+    
     data = {'mostviewed': max}
     dfff = pd.DataFrame(data=data)
     dfff.to_csv('max.csv')
+
 
     ## graph
     fig1 = go.Figure(data=[go.Pie(labels=['Likes','Dislikes'], values=[likes,dislikes])])
