@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # videocount = input("How many videos to analyse")
     youtube = youtube_authenticate()
     # search for the query 'python' and retrieve 2 items only
-    response = search(youtube, q=input, maxResults=25)
+    response = search(youtube, q=input, maxResults=15)
     items = response.get("items")
     pnn = [0,0,0]
     positivewords = []
@@ -40,6 +40,7 @@ if __name__ == "__main__":
     titles = ""
     time = []
     try:
+        #creating csv files for each analysis
         with open('youtubep.csv','w') as csvfilep, open('youtuben.csv','w') as csvfilen, open('youtube.csv','w') as csvfile, open('video.csv','w') as vfile:
         
             for item in items:
@@ -52,6 +53,7 @@ if __name__ == "__main__":
                             'maxResults': 2,
                             'order': 'relevance', # default is 'time' (newest)
                         }
+
                         # get the video details
                         try:
                             video_response = get_video_details(youtube, id=video_id)
@@ -63,10 +65,9 @@ if __name__ == "__main__":
                             video_rows = [titles, views]
                             writerv = csv.writer(vfile)
                             writerv.writerow(video_rows)
-                            #df = pd.DataFrame(video_rows.)
-                            # print the video details
                             print_video_infos(video_response)
                             print(video_id)
+
                             # show comments
                             n_pages = 2
                             
@@ -76,8 +77,8 @@ if __name__ == "__main__":
                                 elif(len(video_id)<12):
                                         response = get_comments(youtube, **params)
                                         items = response.get("items")
+
                                 # loop for each comments
-                                
                                 for item in items:
                                     comment = item["snippet"]["topLevelComment"]["snippet"]["textDisplay"]
                                     updated_at = item["snippet"]["topLevelComment"]["snippet"]["updatedAt"]
@@ -89,10 +90,12 @@ if __name__ == "__main__":
                                     Updated At: {updated_at}
                                     ==================================\
                                     """)
+
                                     #csvfile
                                     rows = [comment,updated_at,like_count]
                                     text = TextBlob(comment)
                                     print(text.sentiment)
+                                    
                                     # print(text.sentiment.polarity)
                                     print(text.sentiment_assessments)
                                     time.append(updated_at)
@@ -112,8 +115,6 @@ if __name__ == "__main__":
                                         writer = csv.writer(csvfile)
                                         writer.writerow(rows)
                                 if "nextPageToken" in response:
-                                # if there is a next page
-                                # add next page token to the params we pass to the function
                                     params["pageToken"] =  response["nextPageToken"]
                                 else:
                                 # end of comments
@@ -130,29 +131,14 @@ if __name__ == "__main__":
     pos = pnn[0]
     neu = pnn[2]
     
-    ## video details
-
-    #with open("video.csv","r") as vfile:
+    ## most viewed video details
     col_name = ['title','views']
     df = pd.read_csv('video.csv', names=col_name, encoding= 'unicode_escape')
     max = df.sort_values(by=['views']).max()
-    #max = df.groupby(['views']).mean()
-    #max2 = df.loc[df['views'].isin(max)]
     print(max)
     data = {'mostviewed': max}
     dfff = pd.DataFrame(data=data)
     dfff.to_csv('max.csv')
-
-    #with open('max.csv','w') as mfile:
-    #    writerm = csv.writer(mfile)
-    #    writernm.writerow(max)
-    #maxview = pd.DataFrame(video_rows[1])
-    #maxview = pd.DataFrame(video_rows,columns=list('view'))
-    #print(df)
-    #next(df, None)
-    #max_view=max(df)
-    #print(max_view)
-
 
     ## graph
     fig1 = go.Figure(data=[go.Pie(labels=['Likes','Dislikes'], values=[likes,dislikes])])
